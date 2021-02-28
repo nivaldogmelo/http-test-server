@@ -77,6 +77,13 @@ func allHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Body = %s\n", body)
 }
 
+func errorHandler(w http.ResponseWriter, r *http.Request) {
+	response, _ := json.Marshal(map[string]string{"error": "Request returned an error"})
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusBadRequest)
+	w.Write(response)
+}
+
 func helloHandler(w http.ResponseWriter, r *http.Request) {
 	requestTime := time.Now().Format("15:04:05")
 
@@ -94,6 +101,7 @@ func main() {
 	r.HandleFunc("/all", allHandler)
 	r.HandleFunc("/body", bodyHandler).Methods("POST")
 	r.HandleFunc("/headers", headerHandler).Methods("GET", "POST")
+	r.HandleFunc("/error", errorHandler)
 
 	log.Println("Starting to serve at port 3000...")
 	log.Fatal(http.ListenAndServe(":3000", r))
